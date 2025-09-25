@@ -1,0 +1,44 @@
+{
+  "manifest_version": 2,
+  "name": "Privacy Guard – Tracker Blocker",
+  "version": "1.0.0",
+  "description": "Detects and blocks known tracking domains (EasyList), shows third‑party connections, cookies, storage, cookie sync, and fingerprinting attempts.",
+  "applications": {
+    "gecko": {
+      "id": "privacy-guard@example.com",
+      "strict_min_version": "91.0"
+    }
+  },
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>",
+    "webNavigation",
+    "cookies",
+    "storage",
+    "tabs",
+    "activeTab"
+  ],
+  "background": {
+    "scripts": ["js/background.js"],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_title": "Privacy Guard",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "48": "assets/icon48.png",
+    "96": "assets/icon96.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["js/content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    "assets/easylist.txt"
+  ]
+}

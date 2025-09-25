@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Guard</title>
+    <link rel="stylesheet" href="css/popup.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="title">Privacy Guard</div>
+      <div class="theme-toggle">
+        <button id="themeBtn" class="icon-btn" aria-label="Alternar tema" title="Alternar tema">
+          <span class="icon moon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
+          <span class="icon sun" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></span>
+        </button>
+      </div>
+    </header>
+    <main>
+      <!-- Score on top as a standalone horizontal bar -->
+      <section class="block score-block">
+        <div class="score-head">
+          <span>Privacy Score</span>
+          <strong id="scoreNum">—</strong>
+        </div>
+        <div id="scoreBar" class="score-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="scoreFill" class="score-fill" style="width:0%"></div>
+        </div>
+      </section>
+
+      <!-- Quick KPIs summary -->
+      <section class="block kpis">
+        <div class="grid">
+          <div class="kpi">
+            <span id="blocked">0</span><small>rastreadores bloqueados</small>
+          </div>
+          <div class="kpi">
+            <span id="thirdParty">0</span><small>requisições 3ª parte</small>
+          </div>
+          <div class="kpi">
+            <span id="setCookies">0</span><small>headers Set‑Cookie</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="block" id="blockedSection">
+        <h2>Rastreadores Bloqueados</h2>
+        <ul id="blockedList" class="list scroll"></ul>
+      </section>
+
+      <section class="block" id="connections">
+        <h2>Conexões de Terceiros</h2>
+        <ul id="connList" class="list scroll"></ul>
+      </section>
+
+      <section class="block" id="cookies">
+        <h2>Cookies</h2>
+        <div class="grid">
+          <div>
+            <div class="kpi"><span id="cookieSent">0</span><small>cookies enviados</small></div>
+          </div>
+          <div>
+            <div class="kpi"><span id="cookieSetFP">0</span><small>1ª parte (Set‑Cookie)</small></div>
+          </div>
+          <div>
+            <div class="kpi"><span id="cookieSetTP">0</span><small>3ª parte (Set‑Cookie)</small></div>
+          </div>
+          <div>
+            <div class="kpi"><span id="cookieSession">0</span><small>cookies de sessão</small></div>
+          </div>
+          <div>
+            <div class="kpi"><span id="cookiePersistent">0</span><small>cookies persistentes</small></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block" id="storage">
+        <h2>Storage (HTML5)</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>localStorage</h3>
+            <div class="kv"><span>Chaves</span><strong id="lsKeys">0</strong></div>
+            <div class="kv"><span>Tamanho</span><strong id="lsBytes">0</strong></div>
+          </div>
+          <div class="card">
+            <h3>sessionStorage</h3>
+            <div class="kv"><span>Chaves</span><strong id="ssKeys">0</strong></div>
+            <div class="kv"><span>Tamanho</span><strong id="ssBytes">0</strong></div>
+          </div>
+          <div class="card">
+            <h3>IndexedDB</h3>
+            <div class="kv"><span>Bancos</span><strong id="idbCount">0</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block" id="fingerprint">
+        <h2>Fingerprinting</h2>
+        <div class="kv"><span>Canvas eventos</span><strong id="fpCanvas">0</strong></div>
+        <div class="kv"><span>Potenciais hooks (scripts 3ª parte)</span><strong id="hookRisk">0</strong></div>
+      </section>
+
+      <section class="block" id="sync">
+        <h2>Sincronismo de Cookies</h2>
+        <ul id="syncList" class="list scroll"></ul>
+      </section>
+    </main>
+    <script src="js/popup.js"></script>
+  </body>
+  </html>

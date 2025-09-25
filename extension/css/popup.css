@@ -1,0 +1,97 @@
+:root{
+  --bg: #0e1116;
+  --panel: #151a21;
+  --text: #e6edf3;
+  --muted: #9aa7b5;
+  --accent: #1de982; /* bright green */
+  --accent-weak: rgba(29,233,130,0.2);
+  --ok: #f2c94c;
+  --bad: #ff4d4f;
+  --hair: rgba(255,255,255,0.08);
+}
+
+html.light{
+  --bg: #ffffff;
+  --panel: #f4f6f8;
+  --text: #0b1220;
+  --muted: #586274;
+  --accent: #ff7a00; /* bright orange */
+  --accent-weak: rgba(255,122,0,0.15);
+  /* medium/low colors identical to dark theme */
+  --ok: #f2c94c;
+  --bad: #ff4d4f;
+  --hair: rgba(0,0,0,0.08);
+}
+
+*{ box-sizing:border-box; }
+body{
+  width: 420px;
+  margin:0; padding:0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.4 -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 10px 12px; border-bottom:1px solid var(--hair);
+  background: var(--panel);
+}
+.title{ font-weight:600; letter-spacing: .2px; }
+
+.switch{ position:relative; display:inline-block; width:44px; height:24px; }
+.switch input{ display:none; }
+.slider{ position:absolute; inset:0; background:#424b57; border-radius:20px; cursor:pointer; transition:.2s; }
+.slider:before{ content:""; position:absolute; height:18px; width:18px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+input:checked + .slider{ background: var(--accent); }
+input:checked + .slider:before{ transform: translateX(20px); }
+/* Icon theme button */
+.icon-btn{ display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; border:1px solid var(--hair); background:transparent; color: var(--text); cursor:pointer; }
+.icon{ display:inline-flex; }
+.icon.sun{ display:none; }
+html.light .icon.moon{ display:none; }
+html.light .icon.sun{ display:inline-flex; }
+
+main{ padding: 12px; display:flex; flex-direction:column; gap:12px; }
+.block{ background: var(--panel); padding:12px; border-radius:12px; border:1px solid var(--hair); }
+.block h2{ margin:0 0 8px; font-size:13px; color: var(--muted); font-weight:600; letter-spacing:.2px; }
+
+/* Score bar */
+.score-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.score-head span{ color: var(--muted); }
+.score-head strong{ font-size:16px; }
+.score-bar{ position:relative; height:10px; background: rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; border:1px solid rgba(255,255,255,0.06); }
+.score-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background: var(--accent); transition: width .25s ease; }
+.score-bar.ok .score-fill{ background: var(--ok); }
+.score-bar.bad .score-fill{ background: var(--bad); }
+
+/* Ensure consistent colors: only high score follows theme accent.
+   ok/bad colors are identical across light/dark via CSS variables above. */
+
+.list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.list li{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:transparent; border:1px solid var(--hair); padding:8px 10px; border-radius:10px; }
+.list .host{ color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12.5px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.list .count{ color: var(--muted); }
+.list .badge{ padding:2px 8px; border-radius:999px; background: var(--accent-weak); color: var(--accent); font-weight:600; font-size:12px; }
+.list .dot{ width:7px; height:7px; border-radius:50%; background: var(--accent); opacity:.8; margin-right:6px; }
+.list .left{ display:flex; align-items:center; min-width:0; }
+.list .right{ display:flex; align-items:center; gap:8px; }
+.list li.empty{ justify-content:center; color: var(--muted); font-size:12.5px; }
+.scroll{ max-height: 168px; overflow:auto; }
+
+.grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; align-items:stretch; }
+.grid > * > .kpi{ height:100%; }
+.grid > .card{ height:100%; }
+/* Stat cards equal size and robust content */
+.cards .card.stat{ display:flex; flex-direction:column; justify-content:center; min-height:96px; }
+.card.stat .value{ font-size:20px; font-weight:700; color: var(--accent); line-height:1.1; word-break: break-word; }
+.card.stat .label{ margin-top:6px; color: var(--muted); line-height:1.2; }
+.card.stat .label .sub{ color: var(--muted); opacity:.9; font-size:12px; margin-left:6px; }
+.kpi{ display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(255,255,255,0.04); border:1px solid var(--hair); padding:10px; border-radius:10px; }
+.kpi span{ font-size:18px; font-weight:700; color: var(--accent); line-height:1.1; word-break: break-word; }
+.kpi small{ color: var(--muted); }
+
+.card{ border:1px solid var(--hair); background:rgba(255,255,255,0.04); padding:10px; border-radius:10px; }
+.card h3{ margin:0 0 6px; font-size:13px; color: var(--accent); }
+.kv{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:2px 0; }
+.kv span{ color: var(--muted); white-space:nowrap; }
+.kv strong{ font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:55%; font-variant-numeric: tabular-nums; }
