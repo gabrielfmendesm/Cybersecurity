@@ -87,17 +87,19 @@ function renderStats(t) {
     blockedList.appendChild(li);
   } else {
     blockedEntries.forEach(([host,count])=>{
-      const li = document.createElement('li');
-      const left = document.createElement('div'); left.className = 'left';
-      const dot = document.createElement('span'); dot.className = 'dot';
-      const h = document.createElement('span'); h.className = 'host'; h.textContent = trunc(host, 34); h.title = host;
-      left.appendChild(dot); left.appendChild(h);
-      const right = document.createElement('div'); right.className = 'right';
-      const badge = document.createElement('span'); badge.className = 'badge'; badge.textContent = nf.format(count);
-      right.appendChild(badge);
-      li.appendChild(left); li.appendChild(right);
-      blockedList.appendChild(li);
-    });
+    const li = document.createElement('li');
+    const left = document.createElement('div'); left.className = 'left';
+    const dot = document.createElement('span'); dot.className = 'dot';
+    const h = document.createElement('span'); h.className = 'host'; h.textContent = trunc(host, 34); h.title = host;
+    left.appendChild(dot); left.appendChild(h);
+    const right = document.createElement('div'); right.className = 'right';
+    const badge = document.createElement('span');
+    badge.className = 'badge ' + (count >= 20 ? 'error' : count >= 5 ? 'warn' : 'ok');
+    badge.textContent = nf.format(count);
+    right.appendChild(badge);
+    li.appendChild(left); li.appendChild(right);
+    blockedList.appendChild(li);
+  });
   }
 
   connList.innerHTML = '';
@@ -107,17 +109,19 @@ function renderStats(t) {
     connList.appendChild(li);
   } else {
     connEntries.forEach(([host,count])=>{
-      const li = document.createElement('li');
-      const left = document.createElement('div'); left.className = 'left';
-      const dot = document.createElement('span'); dot.className = 'dot';
-      const h = document.createElement('span'); h.className = 'host'; h.textContent = trunc(host, 34); h.title = host;
-      left.appendChild(dot); left.appendChild(h);
-      const right = document.createElement('div'); right.className = 'right';
-      const badge = document.createElement('span'); badge.className = 'badge'; badge.textContent = nf.format(count);
-      right.appendChild(badge);
-      li.appendChild(left); li.appendChild(right);
-      connList.appendChild(li);
-    });
+    const li = document.createElement('li');
+    const left = document.createElement('div'); left.className = 'left';
+    const dot = document.createElement('span'); dot.className = 'dot';
+    const h = document.createElement('span'); h.className = 'host'; h.textContent = trunc(host, 34); h.title = host;
+    left.appendChild(dot); left.appendChild(h);
+    const right = document.createElement('div'); right.className = 'right';
+    const badge = document.createElement('span');
+    badge.className = 'badge ' + (count >= 50 ? 'error' : count >= 10 ? 'warn' : 'ok');
+    badge.textContent = nf.format(count);
+    right.appendChild(badge);
+    li.appendChild(left); li.appendChild(right);
+    connList.appendChild(li);
+  });
   }
 
   syncList.innerHTML = '';
@@ -148,12 +152,22 @@ function renderStats(t) {
 async function refresh() {
   const tabId = await getActiveTabId();
   if (!tabId) return;
+  
+  // Add loading state
+  const mainElement = document.querySelector('main');
+  mainElement.classList.add('loading');
+  
   const tabs = await browser.tabs.query({active: true, currentWindow: true});
   const url = tabs[0]?.url;
   // Ask background to refresh known cookies for sync detection context
   browser.runtime.sendMessage({ type: 'refresh-cookies', tabId, url });
   const t = await browser.runtime.sendMessage({ type: 'get-stats', tabId });
   renderStats(t || {});
+  
+  // Remove loading state
+  setTimeout(() => {
+    mainElement.classList.remove('loading');
+  }, 300);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

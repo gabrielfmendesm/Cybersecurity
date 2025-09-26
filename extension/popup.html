@@ -44,17 +44,17 @@
       </section>
 
       <section class="block" id="blockedSection">
-        <h2>Rastreadores Bloqueados</h2>
+        <h2><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z"/></svg>Rastreadores Bloqueados</h2>
         <ul id="blockedList" class="list scroll"></ul>
       </section>
 
       <section class="block" id="connections">
-        <h2>Conexões de Terceiros</h2>
+        <h2><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>Conexões de Terceiros</h2>
         <ul id="connList" class="list scroll"></ul>
       </section>
 
       <section class="block" id="cookies">
-        <h2>Cookies</h2>
+        <h2><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM7 12a1.5 1.5 0 1 1 1.5-1.5A1.5 1.5 0 0 1 7 12zm3-4a1 1 0 1 1 1-1 1 1 0 0 1-1 1zm2 8a1 1 0 1 1 1-1 1 1 0 0 1-1 1zm3-4a1.5 1.5 0 1 1 1.5-1.5A1.5 1.5 0 0 1 15 12z"/></svg>Cookies</h2>
         <div class="grid">
           <div>
             <div class="kpi"><span id="cookieSent">0</span><small>cookies enviados</small></div>
@@ -75,33 +75,75 @@
       </section>
 
       <section class="block" id="storage">
-        <h2>Storage (HTML5)</h2>
-        <div class="grid">
-          <div class="card">
-            <h3>localStorage</h3>
-            <div class="kv"><span>Chaves</span><strong id="lsKeys">0</strong></div>
-            <div class="kv"><span>Tamanho</span><strong id="lsBytes">0</strong></div>
+        <h2><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.58 3 4 4.79 4 7s3.58 4 8 4 8-1.79 8-4-3.58-4-8-4zM4 9v3c0 2.21 3.58 4 8 4s8-1.79 8-4V9c0 2.21-3.58 4-8 4s-8-1.79-8-4zm0 5v3c0 2.21 3.58 4 8 4s8-1.79 8-4v-3c0 2.21-3.58 4-8 4s-8-1.79-8-4z"/></svg>Storage (HTML5)</h2>
+        <div class="storage-stack">
+          <div class="storage-card">
+            <div class="storage-header">
+              <h3>localStorage</h3>
+              <div class="storage-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="storage-content">
+              <div class="storage-stat">
+                <span class="stat-value" id="lsKeys">0</span>
+                <span class="stat-label">Chaves</span>
+              </div>
+              <div class="storage-stat">
+                <span class="stat-value" id="lsBytes">0</span>
+                <span class="stat-label">Tamanho</span>
+              </div>
+            </div>
           </div>
-          <div class="card">
-            <h3>sessionStorage</h3>
-            <div class="kv"><span>Chaves</span><strong id="ssKeys">0</strong></div>
-            <div class="kv"><span>Tamanho</span><strong id="ssBytes">0</strong></div>
+          <div class="storage-card">
+            <div class="storage-header">
+              <h3>sessionStorage</h3>
+              <div class="storage-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="storage-content">
+              <div class="storage-stat">
+                <span class="stat-value" id="ssKeys">0</span>
+                <span class="stat-label">Chaves</span>
+              </div>
+              <div class="storage-stat">
+                <span class="stat-value" id="ssBytes">0</span>
+                <span class="stat-label">Tamanho</span>
+              </div>
+            </div>
           </div>
-          <div class="card">
-            <h3>IndexedDB</h3>
-            <div class="kv"><span>Bancos</span><strong id="idbCount">0</strong></div>
+          <div class="storage-card">
+            <div class="storage-header">
+              <h3>IndexedDB</h3>
+              <div class="storage-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="storage-content">
+              <div class="storage-stat">
+                <span class="stat-value" id="idbCount">0</span>
+                <span class="stat-label">Bancos de Dados</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       <section class="block" id="fingerprint">
-        <h2>Fingerprinting</h2>
+        <h2><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27C9.98 4.04 14 4.03 17.15 5.65c1.5.77 2.76 1.86 3.75 3.25.16.22.11.54-.12.7-.23.16-.54.11-.7-.12-.9-1.26-2.04-2.25-3.39-2.94-2.87-1.47-6.54-1.47-9.4.01-1.36.7-2.5 1.7-3.4 2.96-.08.14-.23.21-.39.21zm6.25 12.07c-.13 0-.26-.05-.35-.15-.87-.87-1.34-1.43-2.01-2.64-.69-1.23-1.05-2.73-1.05-4.34 0-2.97 2.54-5.39 5.66-5.39s5.66 2.42 5.66 5.39c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-2.42-2.09-4.39-4.66-4.39-2.57 0-4.66 1.97-4.66 4.39 0 1.44.32 2.77.93 3.85.64 1.15 1.08 1.64 1.85 2.42.19.2.19.51 0 .71-.11.1-.24.15-.37.15zm7.17-1.85c-1.19 0-2.24-.3-3.1-.89-1.49-1.01-2.38-2.65-2.38-4.39 0-.28.22-.5.5-.5s.5.22.5.5c0 1.41.72 2.74 1.94 3.56.71.48 1.54.71 2.54.71.24 0 .64-.03 1.04-.1.27-.05.53.13.58.41.05.27-.13.53-.41.58-.57.11-1.07.12-1.21.12zM14.91 22c-.04 0-.09-.01-.13-.02-1.59-.44-2.63-1.03-3.72-2.1-1.4-1.39-2.17-3.24-2.17-5.22 0-1.62 1.38-2.94 3.08-2.94 1.7 0 3.08 1.32 3.08 2.94 0 1.07.93 1.94 2.08 1.94s2.08-.87 2.08-1.94c0-3.77-3.25-6.83-7.25-6.83-2.84 0-5.44 1.58-6.61 4.03-.39.81-.59 1.76-.59 2.8 0 .78.07 2.01.67 3.61.1.26-.03.55-.29.64-.26.1-.55-.04-.64-.29-.49-1.31-.73-2.61-.73-3.96 0-1.2.23-2.29.68-3.24 1.33-2.79 4.28-4.6 7.51-4.6 4.55 0 8.25 3.51 8.25 7.83 0 1.62-1.38 2.94-3.08 2.94s-3.08-1.32-3.08-2.94c0-1.07-.93-1.94-2.08-1.94s-2.08.87-2.08 1.94c0 1.71.66 3.31 1.87 4.51.95.94 1.86 1.46 3.27 1.85.27.07.42.35.35.61-.05.23-.26.38-.47.38z"/></svg>Fingerprinting</h2>
         <div class="kv"><span>Canvas eventos</span><strong id="fpCanvas">0</strong></div>
         <div class="kv"><span>Potenciais hooks (scripts 3ª parte)</span><strong id="hookRisk">0</strong></div>
       </section>
 
       <section class="block" id="sync">
-        <h2>Sincronismo de Cookies</h2>
+        <h2><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>Sincronismo de Cookies</h2>
         <ul id="syncList" class="list scroll"></ul>
       </section>
     </main>
