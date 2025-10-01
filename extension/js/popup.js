@@ -33,6 +33,7 @@ function renderStats(t) {
   const ssKeys = document.getElementById('ssKeys');
   const ssBytes = document.getElementById('ssBytes');
   const idbCount = document.getElementById('idbCount');
+  const supercookiesTotal = document.getElementById('supercookiesTotal');
   const fpCanvas = document.getElementById('fpCanvas');
   const hookRisk = document.getElementById('hookRisk');
   const blockedList = document.getElementById('blockedList');
@@ -81,6 +82,10 @@ function renderStats(t) {
   ssKeys.textContent = nf.format(t.storage?.session?.keys||0);
   ssBytes.textContent = humanBytes(t.storage?.session?.bytes||0);
   idbCount.textContent = nf.format(t.storage?.idb?.dbs||0);
+  if (supercookiesTotal) {
+    const totalSC = (t.storage?.local?.keys||0) + (t.storage?.session?.keys||0);
+    supercookiesTotal.textContent = nf.format(totalSC);
+  }
   fpCanvas.textContent = nf.format(t.canvasFingerprintEvents||0);
   hookRisk.textContent = nf.format(t.hookRiskEvents||0);
 

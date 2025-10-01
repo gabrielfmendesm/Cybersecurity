@@ -1,16 +1,7 @@
 // Content script: collect storage metrics and detect canvas fingerprinting
 
 (function() {
-  const tabMessage = (type, payload) => {
-    try {
-      browser.runtime.sendMessage({ type, tabId: getTabId(), payload });
-    } catch (e) { /* ignore */ }
-  };
-
-  // Firefox doesn't expose tabId here; background uses sender.tab.id,
-  // but we include a placeholder and background replaces with correct tab.
-  function getTabId(){ return undefined; }
-
+  
   function sizeOfStorage(storage) {
     let keys = 0, bytes = 0;
     try {
@@ -76,4 +67,3 @@
   ['storage'].forEach(evt => window.addEventListener(evt, () => reportStorage()));
   setInterval(reportStorage, 5000);
 })();
-

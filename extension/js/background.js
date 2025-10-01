@@ -56,10 +56,12 @@ const state = {
   tabs: new Map(),
 };
 
+function safeHostname(u) { try { return new URL(u).hostname; } catch { return ''; } }
+
 function resetTab(tabId, topUrl) {
   state.tabs.set(tabId, {
     topUrl: topUrl || '',
-    topDomain: topUrl ? baseDomain(new URL(topUrl).hostname) : '',
+    topDomain: topUrl ? baseDomain(safeHostname(topUrl)) : '',
     thirdPartyConnections: {}, // domain -> count
     requests: [], // recent requests summary
     blockedTrackers: {}, // domain -> count (combined)
@@ -189,7 +191,7 @@ browser.webNavigation.onCommitted.addListener(async (details) => {
       if (tabId < 0) return {}; // not a tab
       const t = state.tabs.get(tabId) || (resetTab(tabId), state.tabs.get(tabId));
       const reqHost = (()=>{ try { return new URL(url).hostname; } catch { return ''; } })();
-      const topDom = t.topDomain || (documentUrl ? baseDomain(new URL(documentUrl).hostname) : '');
+      const topDom = t.topDomain || (documentUrl ? baseDomain(safeHostname(documentUrl)) : '');
       const reqBase = baseDomain(reqHost);
       const isThird = topDom && reqBase && topDom !== reqBase;
 

@@ -1,13 +1,13 @@
 # Privacy Guard (Firefox) — Relatório Técnico
 
-Extensão para navegador Firefox focada em privacidade do usuário, com detecção e bloqueio de rastreadores, visualização de conexões de terceiros, análise de cookies e storage, detecção de fingerprinting e pontuação de privacidade.
+Extensão para navegador Firefox focada em privacidade do usuário, com detecção e bloqueio de rastreadores, visualização de conexões de terceiros, análise de cookies e supercookies (Storage HTML5), detecção de fingerprinting e pontuação de privacidade.
 
 — Diretório da extensão: `extension/`
 
 ## Visão Geral
 
 - Lista EasyList embutida para bloquear domínios de rastreamento.
-- Monitoramento por aba de: conexões de terceiros, cookies, storage (HTML5), cookie sync, fingerprinting (canvas) e risco de hijacking/hook.
+- Monitoramento por aba de: conexões de terceiros, cookies, supercookies (Storage HTML5), cookie sync, fingerprinting (canvas) e risco de hijacking/hook.
 - Score de privacidade (0–100) exibido como barra horizontal com cores alinhadas aos temas.
 - Tema claro/escuro com botão de alternância por ícone (lua/sol).
 - Personalização: blocklist e allowlist do usuário (listas persistentes).
@@ -29,11 +29,13 @@ Extensão para navegador Firefox focada em privacidade do usuário, com detecç�
   - Headers Set‑Cookie: total; segmentação em 1ª parte e 3ª parte.
   - Envio de cookies: conta requisições com header `Cookie`.
   - Sessão x Persistente: classifica por presença de `Expires`/`Max-Age` no Set‑Cookie.
+  - Observação sobre “supercookies”: este projeto aborda “supercookies” no sentido amplo de persistência no cliente mapeando armazenamentos HTML5 (localStorage, sessionStorage e IndexedDB). Técnicas baseadas em cache/ETag/HSTS ou camadas de rede não são detectadas; ver “Limitações”.
 
-- Storage (HTML5)
+- Supercookies (Storage HTML5)
   - localStorage: número de chaves e tamanho estimado (bytes) somando chave+valor.
   - sessionStorage: idem ao localStorage.
   - IndexedDB: contagem de bancos (via `indexedDB.databases()` quando disponível; fallback heurístico quando não).
+  - KPI no popup: “Supercookies (total)” = `localStorage.keys + sessionStorage.keys` (IndexedDB exibido separadamente).
 
 - Cookie Sync (sincronismo)
   - Heurística que verifica parâmetros de query de requisições de 3ª parte buscando nomes de cookies conhecidos, valores idênticos e parâmetros com nomes típicos (sid, uid, _ga, fbp etc.).
@@ -51,7 +53,7 @@ O score começa em 100 e sofre descontos conforme sinais de risco/rasteamento:
 - Rastreadores bloqueados: −2 pontos por evento, até −40.
 - Conexões de terceiros: −1 a cada 5 requisições, até −20.
 - Set‑Cookie (qualquer parte): −1 a cada 5 eventos, até −10.
-- Storage (local + session): −1 a cada 10 chaves, até −10.
+- Supercookies (local + session): −1 a cada 10 chaves, até −10.
 - Fingerprinting (canvas): −15 se houver pelo menos um evento.
 - Cookie Sync: −15 se houver pelo menos um evento.
 - Potenciais hooks (scripts 3ª parte): −5 a cada 5 eventos, até −15.
@@ -87,7 +89,7 @@ Personalização (listas):
   - Coleta métricas de storage e sinaliza eventos de canvas.
 
 - Popup (UI): `extension/popup.html:1`, `extension/css/popup.css:1`, `extension/js/popup.js:1`
-  - Exibe score, conexões de terceiros, cookies, storage, fingerprinting e cookie sync; contém o botão de alternância de tema.
+  - Exibe score, conexões de terceiros, cookies, supercookies (Storage HTML5), fingerprinting e cookie sync; contém o botão de alternância de tema.
   - Seção “Rastreadores Bloqueados” mostra KPIs para 1ª parte, 3ª parte e total.
   - Seção “Listas Personalizadas” para gerenciar `Blocklist` e `Allowlist`.
 
@@ -99,6 +101,13 @@ Personalização (listas):
 - `storage`: persistir preferência de tema.
   - Também persistir listas personalizadas de domínio (blocklist/allowlist).
 - `tabs`, `activeTab`, `webNavigation`: obter contexto da aba e reiniciar métricas por navegação.
+
+## Atribuições e Licenças
+
+- EasyList (arquivo `extension/assets/easylist.txt`)
+  - Site: https://easylist.to/
+  - Licença: CC BY-SA 3.0 — https://easylist.to/pages/licence.html
+  - Texto da licença: https://creativecommons.org/licenses/by-sa/3.0/
 
 ## Limitações conhecidas
 
@@ -114,4 +123,4 @@ Personalização (listas):
 
 ---
 
-Este documento resume o escopo técnico e as decisões de projeto para atender ao objetivo de detectar e apresentar: conexões de 3ª parte, cookies (1ª/3ª, sessão/persistente), storage, sincronismo de cookies, potenciais hooks e fingerprinting, além de bloquear rastreadores conhecidos (EasyList) e compor um score claro e justificável.
+Este documento resume o escopo técnico e as decisões de projeto para atender ao objetivo de detectar e apresentar: conexões de 3ª parte, cookies (1ª/3ª, sessão/persistente), supercookies (Storage HTML5), sincronismo de cookies, potenciais hooks e fingerprinting, além de bloquear rastreadores conhecidos (EasyList) e compor um score claro e justificável.
