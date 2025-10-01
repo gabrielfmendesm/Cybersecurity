@@ -50,6 +50,8 @@ async function loadEasyListDomains() {
 
 const state = {
   trackerDomains: new Set(),
+  userBlocklist: new Set(),
+  userAllowlist: new Set(),
   // per tab stats
   tabs: new Map(),
 };
@@ -60,7 +62,9 @@ function resetTab(tabId, topUrl) {
     topDomain: topUrl ? baseDomain(new URL(topUrl).hostname) : '',
     thirdPartyConnections: {}, // domain -> count
     requests: [], // recent requests summary
-    blockedTrackers: {}, // domain -> count
+    blockedTrackers: {}, // domain -> count (combined)
+    blockedTrackersFirst: {}, // domain -> count (1P)
+    blockedTrackersThird: {}, // domain -> count (3P)
     setCookieCount: 0,
     sessionCookieSets: 0,
     persistentCookieSets: 0,
@@ -153,6 +157,31 @@ browser.webNavigation.onCommitted.addListener(async (details) => {
     state.trackerDomains = new Set();
   }
 
+  // Load user lists from storage
+  async function loadUserLists() {
+    try {
+      const { userBlocklist = [], userAllowlist = [] } = await browser.storage.sync.get(['userBlocklist','userAllowlist']);
+      const norm = (arr) => new Set((Array.isArray(arr)?arr:[]).map(x => String(x || '').toLowerCase().trim()).filter(Boolean));
+      state.userBlocklist = norm(userBlocklist);
+      state.userAllowlist = norm(userAllowlist);
+    } catch (e) {
+      // keep previous
+    }
+  }
+  await loadUserLists();
+
+  // React to storage changes (sync lists)
+  browser.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'sync') return;
+    let need = false;
+    if (changes.userBlocklist) need = true;
+    if (changes.userAllowlist) need = true;
+    if (need) {
+      // refresh asynchronously
+      Promise.resolve().then(() => loadUserLists());
+    }
+  });
+
   // Intercept requests
   browser.webRequest.onBeforeRequest.addListener(
     (details) => {
@@ -168,16 +197,36 @@ browser.webNavigation.onCommitted.addListener(async (details) => {
         t.thirdPartyConnections[reqBase] = (t.thirdPartyConnections[reqBase]||0)+1;
       }
 
-      // Tracker match
+      // Tracker match with personalization (allowlist > userBlocklist > EasyList)
       let isTracker = false;
+      let matchedDomain = '';
       if (reqHost) {
-        // check host and parent domains
-        if (state.trackerDomains.has(reqHost)) isTracker = true;
-        else {
-          const parts = reqHost.split('.');
-          for (let i=1;i<parts.length-1 && !isTracker;i++) {
-            const cand = parts.slice(i).join('.');
-            if (state.trackerDomains.has(cand)) isTracker = true;
+        // If host or its parents are allowlisted, never treat as tracker
+        const allowHit = (() => {
+          if (!state.userAllowlist || state.userAllowlist.size === 0) return false;
+          for (const d of state.userAllowlist) {
+            if (isSubdomainOf(reqHost, d)) return true;
+          }
+          return false;
+        })();
+        if (!allowHit) {
+          // user blocklist
+          let userBlockHit = false;
+          for (const d of state.userBlocklist) {
+            if (isSubdomainOf(reqHost, d)) { userBlockHit = true; matchedDomain = d; break; }
+          }
+          if (userBlockHit) {
+            isTracker = true;
+          } else {
+            // EasyList domains: check host and parent domains
+            if (state.trackerDomains.has(reqHost)) { isTracker = true; matchedDomain = reqHost; }
+            else {
+              const parts = reqHost.split('.');
+              for (let i=1;i<parts.length-1 && !isTracker;i++) {
+                const cand = parts.slice(i).join('.');
+                if (state.trackerDomains.has(cand)) { isTracker = true; matchedDomain = cand; }
+              }
+            }
           }
         }
       }
@@ -186,7 +235,13 @@ browser.webNavigation.onCommitted.addListener(async (details) => {
       if (isThird) detectCookieSync(t, url);
 
       if (isTracker) {
-        t.blockedTrackers[reqBase||reqHost] = (t.blockedTrackers[reqBase||reqHost]||0)+1;
+        const key = reqBase || reqHost || matchedDomain || 'unknown';
+        t.blockedTrackers[key] = (t.blockedTrackers[key]||0)+1;
+        if (isThird) {
+          t.blockedTrackersThird[key] = (t.blockedTrackersThird[key]||0)+1;
+        } else {
+          t.blockedTrackersFirst[key] = (t.blockedTrackersFirst[key]||0)+1;
+        }
         t.requests.push({ url, type, action: 'blocked' });
         t.privacyScore = computeScore(t);
         return { cancel: true };

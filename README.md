@@ -10,6 +10,8 @@ Extensão para navegador Firefox focada em privacidade do usuário, com detecç�
 - Monitoramento por aba de: conexões de terceiros, cookies, storage (HTML5), cookie sync, fingerprinting (canvas) e risco de hijacking/hook.
 - Score de privacidade (0–100) exibido como barra horizontal com cores alinhadas aos temas.
 - Tema claro/escuro com botão de alternância por ícone (lua/sol).
+- Personalização: blocklist e allowlist do usuário (listas persistentes).
+- Diferenciação de bloqueios: rastreadores de 1ª parte vs 3ª parte (KPI no popup).
 
 ## O que é analisado
 
@@ -20,6 +22,8 @@ Extensão para navegador Firefox focada em privacidade do usuário, com detecç�
 - Rastreadores (bloqueio)
   - Compara o host de cada requisição com a EasyList (subconjunto host-based `||dominio^`).
   - Se houver match (inclui subdomínios), a requisição é cancelada (bloqueio).
+  - Precedência de personalização: `allowlist` do usuário > `blocklist` do usuário > EasyList.
+  - Classificação de bloqueios: 1ª parte (mesmo domínio base) e 3ª parte (domínios diferentes).
 
 - Cookies
   - Headers Set‑Cookie: total; segmentação em 1ª parte e 3ª parte.
@@ -68,16 +72,24 @@ Carregar temporariamente no Firefox (desenvolvimento):
 Alternância de tema:
 - Use o botão de tema no cabeçalho do popup. O estado (claro/escuro) é salvo em `storage.sync` e persiste entre sessões.
 
+Personalização (listas):
+- No popup, use a seção “Listas Personalizadas” para adicionar domínios à `Blocklist` (sempre bloquear) e à `Allowlist` (nunca bloquear). Domínios aceitam subdomínios.
+- As listas são salvas em `storage.sync` e aplicadas imediatamente; a `Allowlist` tem precedência sobre todas as demais regras.
+
 ## Arquitetura (resumo)
 
 - Background: `extension/js/background.js:1`
   - Carrega/parsa a EasyList, intercepta `webRequest` (bloqueio e métricas), inspeciona headers, agrega estatísticas por aba, responde ao popup.
+  - Carrega e observa `userBlocklist` e `userAllowlist` (`storage.sync`), aplicando precedência nas decisões de bloqueio.
+  - Conta bloqueios de 1ª e 3ª parte separadamente.
 
 - Content Script: `extension/js/content.js:1`
   - Coleta métricas de storage e sinaliza eventos de canvas.
 
 - Popup (UI): `extension/popup.html:1`, `extension/css/popup.css:1`, `extension/js/popup.js:1`
   - Exibe score, conexões de terceiros, cookies, storage, fingerprinting e cookie sync; contém o botão de alternância de tema.
+  - Seção “Rastreadores Bloqueados” mostra KPIs para 1ª parte, 3ª parte e total.
+  - Seção “Listas Personalizadas” para gerenciar `Blocklist` e `Allowlist`.
 
 ## Permissões e justificativa
 
@@ -85,6 +97,7 @@ Alternância de tema:
 - `<all_urls>`: observar tráfego da aba ativa para contabilização e bloqueio.
 - `cookies`: leitura de cookies de 1ª parte para heurística de cookie sync.
 - `storage`: persistir preferência de tema.
+  - Também persistir listas personalizadas de domínio (blocklist/allowlist).
 - `tabs`, `activeTab`, `webNavigation`: obter contexto da aba e reiniciar métricas por navegação.
 
 ## Limitações conhecidas
@@ -92,6 +105,7 @@ Alternância de tema:
 - O motor de regras usa o subconjunto host‑based da EasyList (`||dominio^`). Regras complexas (cosméticas, exceções específicas) não são aplicadas.
 - Indexação de IndexedDB pode não estar disponível em todas as versões; usa fallback heurístico.
 - Heurísticas (cookie sync, hooks, fingerprint) são indicadores — não substituem auditoria completa.
+- Personalização atual é host-based; não há suporte a regras avançadas (ex.: paths, tipos de recurso, exceções condicionais).
 
 ## Troubleshooting
 

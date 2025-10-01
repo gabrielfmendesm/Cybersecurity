@@ -38,6 +38,9 @@ function renderStats(t) {
   const blockedList = document.getElementById('blockedList');
   const connList = document.getElementById('connList');
   const syncList = document.getElementById('syncList');
+  const blockedFP = document.getElementById('blockedFP');
+  const blockedTP = document.getElementById('blockedTP');
+  const blockedTotal = document.getElementById('blockedTotal');
 
   const blockedCount = Object.values(t.blockedTrackers||{}).reduce((a,b)=>a+b,0) || 0;
   const tpCount = Object.values(t.thirdPartyConnections||{}).reduce((a,b)=>a+b,0) || 0;
@@ -61,6 +64,11 @@ function renderStats(t) {
   };
 
   blocked.textContent = nf.format(blockedCount);
+  const blockedFPCount = Object.values(t.blockedTrackersFirst||{}).reduce((a,b)=>a+b,0) || 0;
+  const blockedTPCount = Object.values(t.blockedTrackersThird||{}).reduce((a,b)=>a+b,0) || 0;
+  if (blockedFP) blockedFP.textContent = nf.format(blockedFPCount);
+  if (blockedTP) blockedTP.textContent = nf.format(blockedTPCount);
+  if (blockedTotal) blockedTotal.textContent = nf.format(blockedCount);
   thirdParty.textContent = nf.format(tpCount);
   setCookies.textContent = nf.format(t.setCookieCount||0);
   cookieSent.textContent = nf.format(t.cookieHeaderCount||0);
@@ -170,6 +178,107 @@ async function refresh() {
   }, 300);
 }
 
+// ---- Personalization: user blocklist/allowlist management ----
+function normalizeDomain(input) {
+  const s = String(input || '').trim().toLowerCase();
+  // Strip protocol and path if pasted
+  try { const u = new URL(s); return u.hostname; } catch(_) {}
+  return s.replace(/^\.+/, '').replace(/\.$/, '');
+}
+
+function isValidDomain(d) {
+  if (!d || d.length < 3) return false;
+  if (!d.includes('.')) return false;
+  return /^[a-z0-9.-]+$/.test(d);
+}
+
+async function getUserLists() {
+  const { userBlocklist = [], userAllowlist = [] } = await browser.storage.sync.get(['userBlocklist','userAllowlist']);
+  return { userBlocklist: Array.isArray(userBlocklist)?userBlocklist:[], userAllowlist: Array.isArray(userAllowlist)?userAllowlist:[] };
+}
+
+async function setUserLists(next) {
+  await browser.storage.sync.set(next);
+}
+
+function renderDomainList(container, domains, onRemove) {
+  container.innerHTML = '';
+  if (!domains.length) {
+    const li = document.createElement('li'); li.className = 'empty'; li.textContent = 'Nenhum domínio adicionado';
+    container.appendChild(li); return;
+  }
+  domains.sort((a,b)=>a.localeCompare(b)).forEach(dom => {
+    const li = document.createElement('li');
+    const left = document.createElement('div'); left.className = 'left';
+    const dot = document.createElement('span'); dot.className = 'dot';
+    const h = document.createElement('span'); h.className = 'host'; h.textContent = dom; h.title = dom;
+    left.appendChild(dot); left.appendChild(h);
+    const right = document.createElement('div'); right.className = 'right';
+    const rm = document.createElement('button'); rm.className = 'remove-btn'; rm.textContent = 'Remover';
+    rm.addEventListener('click', (e) => { e.preventDefault(); onRemove(dom); });
+    right.appendChild(rm);
+    li.appendChild(left); li.appendChild(right);
+    container.appendChild(li);
+  });
+}
+
+async function loadAndRenderLists() {
+  const blListEl = document.getElementById('blList');
+  const alListEl = document.getElementById('alList');
+  if (!blListEl || !alListEl) return; // UI not present
+  const { userBlocklist, userAllowlist } = await getUserLists();
+  renderDomainList(blListEl, userBlocklist, async (dom) => {
+    const cur = await getUserLists();
+    const next = cur.userBlocklist.filter(d => d !== dom);
+    await setUserLists({ userBlocklist: next });
+    loadAndRenderLists();
+  });
+  renderDomainList(alListEl, userAllowlist, async (dom) => {
+    const cur = await getUserLists();
+    const next = cur.userAllowlist.filter(d => d !== dom);
+    await setUserLists({ userAllowlist: next });
+    loadAndRenderLists();
+  });
+}
+
+function wireListInputs() {
+  const blInput = document.getElementById('blInput');
+  const blAdd = document.getElementById('blAdd');
+  const alInput = document.getElementById('alInput');
+  const alAdd = document.getElementById('alAdd');
+  if (blAdd) {
+    blAdd.addEventListener('click', async () => {
+      const raw = blInput.value; const dom = normalizeDomain(raw);
+      if (!isValidDomain(dom)) { blInput.focus(); return; }
+      const cur = await getUserLists();
+      const set = new Set(cur.userBlocklist.concat([dom]));
+      await setUserLists({ userBlocklist: Array.from(set) });
+      blInput.value='';
+      loadAndRenderLists();
+    });
+  }
+  if (alAdd) {
+    alAdd.addEventListener('click', async () => {
+      const raw = alInput.value; const dom = normalizeDomain(raw);
+      if (!isValidDomain(dom)) { alInput.focus(); return; }
+      const cur = await getUserLists();
+      const set = new Set(cur.userAllowlist.concat([dom]));
+      await setUserLists({ userAllowlist: Array.from(set) });
+      alInput.value='';
+      loadAndRenderLists();
+    });
+  }
+  [blInput, alInput].forEach((inp, idx) => {
+    if (!inp) return;
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        (idx===0 ? blAdd : alAdd).click();
+      }
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadTheme();
   await refresh();
@@ -181,4 +290,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setThemeClass(isLight);
     await saveTheme(isLight);
   });
+
+  // Lists personalization
+  wireListInputs();
+  loadAndRenderLists();
 });
