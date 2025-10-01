@@ -1,7 +1,11 @@
 // Content script: collect storage metrics and detect canvas fingerprinting
 
 (function() {
-  
+  // Relay events from page context to background
+  window.addEventListener('pg-canvas-fp', () => {
+    try { browser.runtime.sendMessage({ type: 'canvas-fingerprint', tabId: undefined }); } catch(_){}
+  });
+
   function sizeOfStorage(storage) {
     let keys = 0, bytes = 0;
     try {
@@ -60,7 +64,40 @@
     } catch(_) {}
   }
 
+  // Inject hooks into the page's JS context (outside the content-script world)
+  function injectCanvasHook() {
+    try {
+      const code = `(() => {
+        try {
+          const p = HTMLCanvasElement.prototype;
+          const c2d = CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;
+          if (p && !p.toDataURL.__pgHooked) {
+            const orig = p.toDataURL;
+            p.toDataURL = function(...args){
+              try { window.dispatchEvent(new CustomEvent('pg-canvas-fp', {detail:{m:'toDataURL'}})); } catch(_){}
+              return orig.apply(this, args);
+            };
+            p.toDataURL.__pgHooked = true;
+          }
+          if (c2d && !c2d.getImageData.__pgHooked) {
+            const origGD = c2d.getImageData;
+            c2d.getImageData = function(...args){
+              try { window.dispatchEvent(new CustomEvent('pg-canvas-fp', {detail:{m:'getImageData'}})); } catch(_){}
+              return origGD.apply(this, args);
+            };
+            c2d.getImageData.__pgHooked = true;
+          }
+        } catch(_) {}
+      })();`;
+      const s = document.createElement('script');
+      s.textContent = code;
+      (document.documentElement || document.head || document.body).appendChild(s);
+      s.remove();
+    } catch(_) {}
+  }
+
   hookCanvas();
+  injectCanvasHook();
   reportStorage();
 
   // Re-report storage on events that likely change it
